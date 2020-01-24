@@ -1,6 +1,7 @@
 'use strict';
 
-const fs = require(`fs`);
+const chalk = require(`chalk`);
+const fs = require(`fs`).promises;
 
 const {
   ExitCode
@@ -94,7 +95,7 @@ const generateArticles = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     if (count > 1000) {
       console.log(`Не больше 1000 публикаций`);
@@ -104,14 +105,12 @@ module.exports = {
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
     const content = JSON.stringify(generateArticles(countArticles));
 
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        console.error(`Ошибка записи данных в файл...`);
-        return process.exit(ExitCode.error);
-      }
-      console.log(`Файл mocks.json c тестовыми публикациями успешно создан.`);
-      return process.exit(ExitCode.success);
-    });
+    try {
+      await fs.writeFile(FILE_NAME, content);
+      console.log(chalk.green(`Файл mocks.json c тестовыми данными успешно создан.`));
+    } catch (err) {
+      console.error(chalk.red(`Ошибка записи данных в файл...`));
+    }
 
   }
 };
