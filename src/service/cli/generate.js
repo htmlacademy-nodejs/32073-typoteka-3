@@ -69,6 +69,11 @@ const ANNOUNCE_SENTENCES_RESTRICT = {
   max: 5,
 };
 
+const CATEGORIES_RESTRICT = {
+  min: 1,
+  max: 3,
+};
+
 const DATE_MONTHS_RANGE = 2;
 
 const generateDate = (dateMonthsRange) => {
@@ -81,9 +86,9 @@ const generateArticles = (count) => (
   Array(count).fill({}).map(() => ({
     title: TITLES[getRandomInt(0, TITLES.length - 1)],
     announce: shuffle(SENTENCES).slice(ANNOUNCE_SENTENCES_RESTRICT.min, ANNOUNCE_SENTENCES_RESTRICT.max).join(` `),
-    fullText: shuffle(SENTENCES).slice(getRandomInt(0, SENTENCES.length - 1)),
+    fullText: shuffle(SENTENCES).slice(getRandomInt(0, SENTENCES.length - 1)).join(` `),
     createdDate: generateDate(DATE_MONTHS_RANGE),
-    category: [CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]],
+    category: shuffle(CATEGORIES).slice(CATEGORIES_RESTRICT.min, CATEGORIES_RESTRICT.max),
   }))
 );
 
