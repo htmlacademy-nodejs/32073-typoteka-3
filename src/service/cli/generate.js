@@ -78,6 +78,5 @@ module.exports = {
     } catch (err) {
       console.error(chalk.red(`Ошибка записи данных в файл...`));
     }
-
   }
 };
