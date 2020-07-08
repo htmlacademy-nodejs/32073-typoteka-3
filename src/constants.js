@@ -6,6 +6,10 @@ module.exports.ExitCode = {
   error: 1,
   success: 0,
 };
+module.exports.ErrorCode = {
+  NO_FILE_OR_DIRECTORY: `ENOENT`
+};
+module.exports.MOCK_FILE_PATH = `mocks.json`;
 module.exports.HttpCode = {
   OK: 200,
   NOT_FOUND: 404,
