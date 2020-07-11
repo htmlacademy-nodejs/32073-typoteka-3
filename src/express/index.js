@@ -11,15 +11,18 @@ const PUBLIC_DIR = `public`;
 
 const app = express();
 
+app.set(`views`, path.resolve(__dirname, `templates`));
+app.set(`view engine`, `pug`);
+
+app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
+
 app.use(`/articles`, articlesRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/`, mainRoutes);
 
-app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
-
-app.use((req, res) => res.status(400).send(`errors/404`));
+app.use((req, res) => res.status(400).render(`404`));
 app.use((err, req, res, next) => {
-  res.status(500).send(`errors/500`);
+  res.status(500).render(`500`);
   next();
 });
 
