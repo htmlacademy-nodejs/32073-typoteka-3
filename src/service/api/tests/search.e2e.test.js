@@ -120,7 +120,7 @@ beforeAll(async () => {
       ]
     }
   ];
-  server = await getServer(mockData);
+  server = getServer(mockData);
 });
 
 describe(`Search API end-to-end tests`, () => {

@@ -11,7 +11,7 @@ let mockData;
 
 beforeAll(async () => {
   mockData = await getMockData();
-  server = await getServer(mockData);
+  server = getServer(mockData);
 });
 
 describe(`Categories API end-to-end tests`, () => {
