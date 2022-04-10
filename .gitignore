@@ -18,4 +18,4 @@ build/
 mocks.json
 
 #Логи
-src/service/logs
+src/service/logs/
