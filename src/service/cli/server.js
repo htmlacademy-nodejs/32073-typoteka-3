@@ -1,36 +1,33 @@
-"use strict";
+'use strict';
 
-const chalk = require(`chalk`);
-const express = require(`express`);
-const {HttpCode, API_PREFIX} = require(`../../constants`);
+const {getServer} = require(`../api-server`);
+const {getLogger} = require(`../lib/logger`);
+const {ExitCode} = require(`../../constants`);
 const getMockData = require(`../lib/get-mock-data`);
-const routes = require(`../api`);
+
 const DEFAULT_PORT = 3000;
-
-const app = express();
-app.use(express.json());
-app.use(API_PREFIX, routes);
-
-app.use((req, res) => res.status(HttpCode.NOT_FOUND).send(`Not found`));
 
 module.exports = {
   name: `--server`,
   async run(args) {
     const [customPort] = args;
-    const port = Number(customPort) || DEFAULT_PORT;
-    try {
-      await getMockData();
+    const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
+    const logger = getLogger({name: `api`});
 
-      app.listen(port, (error) => {
-        if (error) {
-          console.info(chalk.green(`Ошибка при запуске сервера`, error));
+    try {
+      const mockData = await getMockData();
+      const server = await getServer(mockData);
+
+      server.listen(port, (err) => {
+        if (err) {
+          logger.error(`An error occured on server creation: ${err.message}`);
         }
 
-        console.info(chalk.green(`Ожидаю соединений на порт ${port}`));
+        logger.info(`Server is running on port: ${port}`);
       });
     } catch (err) {
-      console.error(`Произошла ошибка: ${err.message}`);
-      process.exit(1);
+      logger.error(`An error occured: ${err.message}`, err);
+      process.exit(ExitCode.ERROR);
     }
-  },
+  }
 };

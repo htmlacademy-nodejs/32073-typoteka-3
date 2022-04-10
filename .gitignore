@@ -16,3 +16,6 @@ build/
 
 # Файл моков
 mocks.json
+
+#Логи
+src/service/logs/
