@@ -25,9 +25,7 @@ const upload = multer({storage});
 
 articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
 articlesRouter.get(`/add`, async (req, res) => {
-  const [categories] = await Promise.all([
-    api.getCategories()
-  ]);
+  const categories = await api.getCategories();
   res.render(`new-post`, {categories});
 });
 
