@@ -24,12 +24,12 @@ class API {
     return await this._load(`/articles`);
   }
 
-  getArticle(id) {
-    return this._load(`/articles/${id}`);
+  async getArticle(id) {
+    return await this._load(`/articles/${id}`);
   }
 
-  search(query) {
-    return this._load(`/search`, {params: {query}});
+  async search(query) {
+    return await this._load(`/search`, {params: {query}});
   }
 
   async getCategories() {
