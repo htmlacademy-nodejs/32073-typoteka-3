@@ -20,6 +20,7 @@ const FILE_NAME = `mocks.json`;
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
+const FILE_IMAGES_PATH = `./data/images.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
@@ -60,11 +61,14 @@ const generateComments = (count, comments) => (
   }))
 );
 
-const generateArticles = (count, titles, categories, sentences, comments) => (
+const generateImage = (images) => images[getRandomInt(0, images.length - 1)];
+
+const generateArticles = (count, titles, categories, images, sentences, comments) => (
   Array(count).fill({}).map(() => ({
     id: nanoid(MAX_ID_LENGTH),
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffle(sentences).slice(ANNOUNCE_SENTENCES_RESTRICT.min, ANNOUNCE_SENTENCES_RESTRICT.max).join(` `),
+    image: generateImage(images),
     fullText: shuffle(sentences).slice(getRandomInt(0, sentences.length - 1)).join(` `),
     createdDate: generateDate(DATE_MONTHS_RANGE),
     category: shuffle(categories).slice(CATEGORIES_RESTRICT.min, CATEGORIES_RESTRICT.max),
@@ -85,9 +89,10 @@ module.exports = {
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
+    const images = await readContent(FILE_IMAGES_PATH);
 
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateArticles(countArticles, titles, categories, sentences, comments));
+    const content = JSON.stringify(generateArticles(countArticles, titles, categories, images, sentences, comments));
 
     try {
       await fs.writeFile(FILE_NAME, content);
