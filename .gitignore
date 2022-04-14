@@ -19,3 +19,6 @@ mocks.json
 
 #Логи
 src/service/logs/
+
+# Директория с загруженными изображениями
+src/express/upload/
