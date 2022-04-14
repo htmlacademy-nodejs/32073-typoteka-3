@@ -34,7 +34,7 @@ CREATE TABLE articles(
   title varchar(255) NOT NULL,
   announce text NOT NULL,
   full_text text NOT NULL,
-  picture varchar(50),
+  image varchar(50),
   user_id integer NOT NULL,
   created_at timestamp DEFAULT current_timestamp,
   FOREIGN KEY (user_id) REFERENCES users(id)
