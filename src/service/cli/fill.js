@@ -2,11 +2,9 @@
 
 const chalk = require(`chalk`);
 const fs = require(`fs`).promises;
-const {nanoid} = require(`nanoid`);
 
 const {
   ExitCode,
-  MAX_ID_LENGTH,
 } = require(`../../constants`);
 
 const {
@@ -27,11 +25,6 @@ const FILE_COMMENTS_PATH = `./data/comments.txt`;
 const ANNOUNCE_SENTENCES_RESTRICT = {
   min: 1,
   max: 5,
-};
-
-const CATEGORIES_RESTRICT = {
-  min: 1,
-  max: 3,
 };
 
 const DATE_MONTHS_RANGE = 2;
@@ -125,8 +118,8 @@ module.exports = {
     const usersValues = users.map(({email, passwordHash, firstName, lastName, avatar}) =>
       `('${email}', '${passwordHash}', '${firstName}', '${lastName}', '${avatar}')`
     ).join(`,\n\t`);
-    const articlesValues = articles.map(({title, announce, fullText, picture, userId}) =>
-      `('${title}', '${announce}', '${fullText}', '${picture}', ${userId})`
+    const articlesValues = articles.map(({title, announce, fullText, image, userId}) =>
+      `('${title}', '${announce}', '${fullText}', '${image}', ${userId})`
     ).join(`,\n\t`);
     const commentsValues = articleComments.map(({text, userId, articleId}) => `(${articleId}, ${userId}, '${text}')`).join(`,\n\t`);
     const articlesCategoriesValues = articlesCategories.map(({articleId, categoryId}) => `(${articleId}, ${categoryId})`).join(`,\n\t`);
@@ -137,7 +130,7 @@ INSERT INTO users(email, password_hash, first_name, last_name, avatar) VALUES
 INSERT INTO categories(name) VALUES
   ${categoriesValues};
 ALTER TABLE articles DISABLE TRIGGER ALL;
-INSERT INTO articles(title, announce, full_text, picture, user_id) VALUES
+INSERT INTO articles(title, announce, full_text, image, user_id) VALUES
   ${articlesValues};
 ALTER TABLE articles ENABLE TRIGGER ALL;
 ALTER TABLE articles_categories DISABLE TRIGGER ALL;
