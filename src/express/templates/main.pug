@@ -82,11 +82,11 @@ block content
       ul.preview__list
         each article in articles
           li.preview__item
-            if article.category.length
+            if article.categories.length
               ul.preview__breadcrumbs
-                each category in article.category
+                each category in article.categories
                   li.preview__breadcrumbs-item
-                    a.preview__breadcrumbs-link(href='#') #{category}
+                    a.preview__breadcrumbs-link(href='#') #{category.name}
             .preview__background
               img.preview__background-image(src=`img/${article.image ? article.image : 'blank.jpg'}` width='460' height='240' alt=`${article.title}`)
             time.preview__time(datetime=`${article.createdDate}`) #{article.createdDate}

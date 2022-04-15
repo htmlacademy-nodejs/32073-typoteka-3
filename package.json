@@ -5,9 +5,10 @@
   "main": "./src/service/service.js",
   "scripts": {
     "start": "cross-env LOG_LEVEL=error node -r dotenv/config ./src/service/service.js --server 3000",
-    "start::debug": "cross-env LOG_LEVEL=debug NODE_ENV=development node -r dotenv/config ./src/service/service.js --server 3000",
+    "start::debug": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon -r dotenv/config ./src/service/service.js --server 3000",
     "generate": "node ./src/service/service.js --generate",
-    "filldb": "node ./src/service/service.js --fill",
+    "fill": "node ./src/service/service.js --fill",
+    "filldb": "node -r dotenv/config ./src/service/service.js --filldb",
     "test": "npm run eslint && npm run jest",
     "jest": "cross-env LOG_LEVEL=error jest",
     "eslint": "eslint --ext .js src/",

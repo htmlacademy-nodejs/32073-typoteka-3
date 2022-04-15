@@ -12,12 +12,19 @@ const {
   CommentService,
 } = require(`../data-service`);
 
-const getRoutes = (mockData) => {
+const getSequelize = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
+
+
+const getRoutes = () => {
   const app = new Router();
 
-  category(app, new CategoryService(mockData));
-  search(app, new SearchService(mockData));
-  article(app, new ArticleService(mockData), new CommentService());
+  const sequelize = getSequelize();
+  defineModels(sequelize);
+
+  category(app, new CategoryService(sequelize));
+  search(app, new SearchService(sequelize));
+  article(app, new ArticleService(sequelize), new CommentService(sequelize));
 
   return app;
 };

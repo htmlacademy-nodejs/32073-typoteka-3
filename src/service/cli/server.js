@@ -3,14 +3,14 @@
 const {getServer} = require(`../api-server`);
 const {getLogger} = require(`../lib/logger`);
 const {ExitCode} = require(`../../constants`);
-const getMockData = require(`../lib/get-mock-data`);
-const sequelize = require(`../lib/sequelize`);
+const getSequelize = require(`../lib/sequelize`);
 
 const DEFAULT_PORT = 3000;
 
 module.exports = {
   name: `--server`,
   async run(args) {
+    const sequelize = getSequelize();
     const logger = getLogger({name: `api`});
 
     try {
@@ -18,7 +18,7 @@ module.exports = {
       await sequelize.authenticate();
     } catch (err) {
       logger.error(`An error occured while connecting to a database: ${err.message}`);
-      process.exit(1);
+      process.exit(ExitCode.ERROR);
     }
 
     logger.info(`Connection to database established`);
@@ -27,8 +27,7 @@ module.exports = {
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
     try {
-      const mockData = await getMockData();
-      const server = await getServer(mockData);
+      const server = await getServer();
 
       server.listen(port, (err) => {
         if (err) {

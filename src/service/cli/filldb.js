@@ -1,12 +1,14 @@
 'use strict';
 
-const chalk = require(`chalk`);
 const fs = require(`fs`).promises;
-const {nanoid} = require(`nanoid`);
+const chalk = require(`chalk`);
+const getSequelize = require(`../lib/sequelize`);
+const {getLogger} = require(`../lib/logger`);
+const initDatabase = require(`../lib/init-db`);
+const sequelize = getSequelize();
 
 const {
   ExitCode,
-  MAX_ID_LENGTH,
 } = require(`../../constants`);
 
 const {
@@ -16,7 +18,6 @@ const {
 
 const DEFAULT_COUNT = 1;
 const MAX_COMMENTS = 4;
-const FILE_NAME = `mocks.json`;
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
@@ -26,15 +27,18 @@ const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
 const ANNOUNCE_SENTENCES_RESTRICT = {
   min: 1,
-  max: 5,
-};
-
-const CATEGORIES_RESTRICT = {
-  min: 1,
   max: 3,
 };
 
+const FULLTEXT_SENTENCES_RESTRICT = {
+  min: 1,
+  max: 5,
+};
+
 const DATE_MONTHS_RANGE = 2;
+
+const logger = getLogger({name: `filldb`});
+
 
 const readContent = async (filePath) => {
   try {
@@ -54,7 +58,6 @@ const generateDate = (dateMonthsRange) => {
 
 const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
-    id: nanoid(MAX_ID_LENGTH),
     text: shuffle(comments)
       .slice(0, getRandomInt(1, 3))
       .join(` `),
@@ -63,27 +66,43 @@ const generateComments = (count, comments) => (
 
 const generateImage = (images) => images[getRandomInt(0, images.length - 1)];
 
+const getRandomSubarray = (items) => {
+  items = items.slice();
+  let count = getRandomInt(1, items.length - 1);
+  const result = [];
+  while (count--) {
+    result.push(
+        ...items.splice(
+            getRandomInt(0, items.length - 1), 1
+        )
+    );
+  }
+  return result;
+};
+
 const generateArticles = (count, titles, categories, images, sentences, comments) => (
   Array(count).fill({}).map(() => ({
-    id: nanoid(MAX_ID_LENGTH),
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffle(sentences).slice(ANNOUNCE_SENTENCES_RESTRICT.min, ANNOUNCE_SENTENCES_RESTRICT.max).join(` `),
     image: generateImage(images),
-    fullText: shuffle(sentences).slice(getRandomInt(0, sentences.length - 1)).join(` `),
+    fullText: shuffle(sentences).slice(FULLTEXT_SENTENCES_RESTRICT.min, FULLTEXT_SENTENCES_RESTRICT.max).join(` `),
     createdDate: generateDate(DATE_MONTHS_RANGE),
-    category: shuffle(categories).slice(CATEGORIES_RESTRICT.min, CATEGORIES_RESTRICT.max),
+    categories: getRandomSubarray(categories),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments),
   }))
 );
 
 module.exports = {
-  name: `--generate`,
+  name: `--filldb`,
   async run(args) {
-    const [count] = args;
-    if (count > 1000) {
-      console.log(`Не больше 1000 публикаций`);
-      process.exit(ExitCode.error);
+    try {
+      logger.info(`Trying to connect to database...`);
+      await sequelize.authenticate();
+    } catch (err) {
+      logger.error(`An error occurred while connecting to database: ${err.message}`);
+      process.exit(ExitCode);
     }
+    logger.info(`Connection to database established`);
 
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const titles = await readContent(FILE_TITLES_PATH);
@@ -91,14 +110,10 @@ module.exports = {
     const comments = await readContent(FILE_COMMENTS_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
 
+    const [count] = args;
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateArticles(countArticles, titles, categories, images, sentences, comments));
+    const articles = generateArticles(countArticles, titles, categories, images, sentences, comments);
 
-    try {
-      await fs.writeFile(FILE_NAME, content);
-      console.log(chalk.green(`Файл mocks.json c тестовыми данными успешно создан.`));
-    } catch (err) {
-      console.error(chalk.red(`Ошибка записи данных в файл...`));
-    }
+    return initDatabase(sequelize, {categories, articles});
   }
 };
