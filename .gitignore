@@ -7,6 +7,9 @@ Thumbs.db
 *.sublime*
 .vscode
 
+# Файл с переменными окружения
+.env
+
 # Вспомогательные файлы
 *.log*
 node_modules/
