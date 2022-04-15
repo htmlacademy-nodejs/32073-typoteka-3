@@ -41,7 +41,6 @@ articlesRouter.get(`/edit/:id`, async (req, res, _next) => {
     ]);
     return res.render(`edit-post`, {article, categories});
   } catch (err) {
-    console.log(`err:`, err);
     return res.status(HttpCode.NOT_FOUND)
       .render(`404`);
   }

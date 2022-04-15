@@ -6,8 +6,8 @@ const expressPinoLogger = require(`express-pino-logger`);
 const {HttpCode, API_PREFIX} = require(`../../constants`);
 const {getRoutes} = require(`../api`);
 
-const getServer = (mockData) => {
-  const routes = getRoutes(mockData);
+const getServer = () => {
+  const routes = getRoutes();
   const server = express();
   const logger = getLogger();
 
