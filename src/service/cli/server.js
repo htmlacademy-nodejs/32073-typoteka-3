@@ -4,6 +4,7 @@ const {getServer} = require(`../api-server`);
 const {getLogger} = require(`../lib/logger`);
 const {ExitCode} = require(`../../constants`);
 const getSequelize = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
 
 const DEFAULT_PORT = 3000;
 
@@ -27,7 +28,8 @@ module.exports = {
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
     try {
-      const server = await getServer();
+      defineModels(sequelize);
+      const server = await getServer(sequelize);
 
       server.listen(port, (err) => {
         if (err) {

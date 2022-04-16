@@ -5,8 +5,15 @@ const mainRouter = new Router();
 const api = require(`../api`).getAPI();
 
 mainRouter.get(`/`, async (req, res) => {
-  const articles = await api.getArticles({comments: true});
-  res.render(`main`, {articles});
+  const [
+    articles,
+    categories
+  ] = await Promise.all([
+    api.getArticles({comments: true}),
+    api.getCategories(true) // опциональный аргумент
+  ]);
+
+  res.render(`main`, {articles, categories});
 });
 mainRouter.get(`/register`, (req, res) => res.render(`sign-up`));
 mainRouter.get(`/login`, (req, res) => res.render(`login`));
@@ -26,6 +33,9 @@ mainRouter.get(`/search`, async (req, res) => {
     });
   }
 });
-mainRouter.get(`/categories`, (req, res) => res.render(`all-categories`));
+mainRouter.get(`/categories`, async (req, res) => {
+  const categories = await api.getCategories();
+  return res.render(`all-categories`, {categories});
+});
 
 module.exports = mainRouter;

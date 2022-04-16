@@ -1,18 +1,22 @@
 "use strict";
 
 let request = require(`supertest`);
+const Sequelize = require(`sequelize`);
+const initDB = require(`../../lib/init-db`);
 
 const {HttpCode, API_PREFIX} = require(`../../../constants`);
 const {getServer} = require(`../../api-server`);
-const getMockData = require(`../../lib/get-mock-data`);
+const mockCategories = require(`./mocks/categories.mock.json`);
+const mockArticles = require(`./mocks/articles.mock.json`);
+
+const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 describe(`Categories API end-to-end tests`, () => {
   let server;
-  let mockData;
 
   beforeAll(async () => {
-    mockData = await getMockData();
-    server = getServer(mockData);
+    await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+    server = getServer(mockDB);
   });
 
   test(`When get categories status code should be 200`, async () => {

@@ -1,6 +1,6 @@
 'use strict';
 
-const Op = require(`sequelize`);
+const {Op} = require(`sequelize`);
 const Aliase = require(`../models/aliase`);
 
 class SearchService {

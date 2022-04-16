@@ -18,8 +18,8 @@ module.exports = (app, articleService, commentService) => {
   });
 
   route.get(`/:articleId`, async (req, res) => {
-    const {articleId} = req.params;
-    const article = await articleService.findOne(articleId);
+    const {articleId, needComments} = req.params;
+    const article = await articleService.findOne(articleId, needComments);
 
     if (!article) {
       return res.status(HttpCode.NOT_FOUND)
