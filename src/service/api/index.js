@@ -12,19 +12,12 @@ const {
   CommentService,
 } = require(`../data-service`);
 
-const getSequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
-
-
-const getRoutes = () => {
+const getRoutes = (db) => {
   const app = new Router();
 
-  const sequelize = getSequelize();
-  defineModels(sequelize);
-
-  category(app, new CategoryService(sequelize));
-  search(app, new SearchService(sequelize));
-  article(app, new ArticleService(sequelize), new CommentService(sequelize));
+  category(app, new CategoryService(db));
+  search(app, new SearchService(db));
+  article(app, new ArticleService(db), new CommentService(db));
 
   return app;
 };

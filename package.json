@@ -32,6 +32,7 @@
     "nodemon": "2.0.2",
     "pino-pretty": "7.6.1",
     "pug-lint": "^2.6.0",
+    "sqlite3": "5.0.3",
     "supertest": "6.2.2"
   },
   "dependencies": {

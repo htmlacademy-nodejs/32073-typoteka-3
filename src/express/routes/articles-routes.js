@@ -29,7 +29,11 @@ articlesRouter.get(`/add`, async (req, res) => {
   res.render(`new-post`, {categories});
 });
 
-articlesRouter.get(`/:id`, (req, res) => res.render(`post`));
+articlesRouter.get(`/:id`, async (req, res) => {
+  const {id} = req.params;
+  const article = await api.getArticle(id);
+  return res.render(`post`, {article});
+});
 
 articlesRouter.get(`/edit/:id`, async (req, res, _next) => {
   const {id} = req.params;

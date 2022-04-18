@@ -10,6 +10,40 @@ head
   link(rel='preload' href='/fonts/SFProDisplay-Regular.woff2' as='font' crossorigin='anonymous')
   link(rel='stylesheet' href='css/style.min.css')
 body
+  style.
+    a.pagination__item--active{
+      pointer-events: none;
+    }
+  -
+    const getRandomInt = (max) => Math.ceil(Math.random()*max);
+  mixin pagination(page, totalPages, width, prefix)
+    -
+      let start = page - width;
+      let end = page + width;
+      if(start < 1){
+        end += 1 - start;
+        start = 1;
+      }
+      if(end > totalPages){
+        start -= end - totalPages;
+        end = totalPages;
+      }
+      if(start < 1){
+        start = 1;
+      }
+      let i = start - 1
+    ul.preview__pagination.pagination
+      if start > 1
+        li
+          a.pagination__button.button.button--backwards(href=`${prefix}page=${page - 1}` aria-label='Страница назад') Назад
+      while i++ < end
+        li.pagination__item
+          a(class={"pagination__item--active": i === page} href=`${prefix}page=${i}`)= i
+      if end < totalPages
+        li
+          a.pagination__button.button.button--forward(href=`${prefix}page=${page + 1}` aria-label='Страница вперед') Вперёд
+  mixin insertArticleImage(article)
+    img(src=`/img/${article.image ? article.image : 'blank.jpg'}` alt=article.title)
   mixin date(dateValue)
     | #{new Date(dateValue).toLocaleDateString(_, {hour: 'numeric', minute: 'numeric'})}
   .wrapper

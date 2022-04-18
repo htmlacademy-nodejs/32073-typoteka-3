@@ -22,7 +22,7 @@ class ArticleService {
   }
 
   findOne(id) {
-    return this._Article.findByPk(id, {include: [Aliase.CATEGORIES]});
+    return this._Article.findByPk(id, {include: [Aliase.CATEGORIES, Aliase.COMMENTS]});
   }
 
   async update(id, article) {
@@ -47,6 +47,25 @@ class ArticleService {
     });
 
     return articles.map((item) => item.get());
+  }
+
+  async findPage({comments, limit, offset}) {
+    const include = [Aliase.CATEGORIES];
+
+    if (comments) {
+      include.push(Aliase.COMMENTS);
+    }
+
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include,
+      order: [
+        [`createdAt`, `DESC`]
+      ],
+      distinct: true
+    });
+    return {count, articles: rows};
   }
 
 }
