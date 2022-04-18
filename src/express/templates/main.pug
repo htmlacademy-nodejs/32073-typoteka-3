@@ -65,7 +65,8 @@ block content
                     a.preview__breadcrumbs-link(href='#') #{category.name}
             .preview__background
               img.preview__background-image(src=`img/${article.image ? article.image : 'blank.jpg'}` width='460' height='240' alt=`${article.title}`)
-            time.preview__time(datetime=`${article.createdDate}`) #{article.createdDate}
+            time.preview__time(datetime=`${article.createdAt}`)
+              +date(article.createdAt)
             h3.preview__name
               a.preview__name-link(href='#') #{article.title}
             p.preview__text #{article.announce}
@@ -74,3 +75,5 @@ block content
               span.preview__cloud
               |
               b.preview__comment-count #{article.comments.length}
+    .preview__toggle-wrapper
+      +pagination(page, totalPages, 2, `?`)

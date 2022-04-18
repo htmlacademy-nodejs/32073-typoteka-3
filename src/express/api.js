@@ -20,8 +20,8 @@ class API {
     return response.data;
   }
 
-  async getArticles({comments}) {
-    return await this._load(`/articles`, {params: {comments}});
+  async getArticles({offset, limit, comments}) {
+    return await this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
   async getArticle(id) {
