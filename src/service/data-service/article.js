@@ -1,16 +1,39 @@
 'use strict';
 
 const Aliase = require(`../models/aliase`);
+const Sequelize = require(`sequelize`);
 class ArticleService {
   constructor(sequelize) {
     this._Article = sequelize.models.Article;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async create(articleData) {
     const article = await this._Article.create(articleData);
-    await article.addCategories(articleData.categories);
+    // await article.addCategories(articleData.categories);
+    const categories = await this._Category.findAll({
+      attributes: [
+        `id`,
+        `name`,
+        [
+          Sequelize.fn(
+              `COUNT`,
+              `*`
+          ),
+          `count`
+        ]
+      ],
+      group: [Sequelize.col(`Category.id`)],
+      include: [{
+        model: this._ArticleCategory,
+        as: Aliase.ARTICLE_CATEGORIES,
+        attributes: []
+      }]
+    });
+    console.log(`categories`, categories);
+    await article.addCategories([`Железо`]);
     return article.get();
   }
 
@@ -29,6 +52,7 @@ class ArticleService {
     const [affectedRows] = await this._Article.update(article, {
       where: {id}
     });
+
     return !!affectedRows;
   }
 
