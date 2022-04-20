@@ -84,8 +84,6 @@ module.exports = (app, articleService, commentService) => {
     const {commentId} = req.params;
     const deletedComment = await commentService.drop(commentId);
 
-    console.log(`deletedComment:`, deletedComment);
-
     if (!deletedComment) {
       return res.status(HttpCode.NOT_FOUND)
         .send(`Not found`);

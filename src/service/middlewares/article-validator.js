@@ -15,12 +15,11 @@ const ErrorArticleMessage = {
 };
 
 const schema = Joi.object({
-  // categories: Joi.array().items(
-  //     Joi.number().integer().positive().messages({
-  //       'number.base': ErrorArticleMessage.CATEGORIES
-  //     })
-  // ).min(1).required(),
-  categories: Joi.any(),
+  categories: Joi.array().items(
+      Joi.number().integer().positive().messages({
+        'number.base': ErrorArticleMessage.CATEGORIES
+      })
+  ).min(1).required(),
   title: Joi.string().min(30).max(250).required().messages({
     'string.min': ErrorArticleMessage.TITLE_MIN,
     'string.max': ErrorArticleMessage.TITLE_MAX
@@ -33,7 +32,7 @@ const schema = Joi.object({
   fullText: Joi.string().optional().max(1000).messages({
     'string.max': ErrorArticleMessage.FULLTEXT_MAX
   }),
-  image: Joi.string().optional(),
+  image: Joi.string().allow(``).optional(),
 });
 
 module.exports = (req, res, next) => {

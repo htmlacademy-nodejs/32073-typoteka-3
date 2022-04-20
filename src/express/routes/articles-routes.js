@@ -51,18 +51,18 @@ articlesRouter.get(`/edit/:id`, async (req, res, _next) => {
 });
 
 articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
-  const {body, file} = req;
   const {id} = req.params;
-  const articleData = {
-    announce: body.announcement,
-    categories: ensureArray(body.categories),
-    fullText: body[`full-text`],
-    picture: file ? file.filename : body[`old-image`],
-    title: body.title,
-  };
+  const {body, file} = req;
 
   try {
-    await api.createArticle(articleData);
+    const articleData = {
+      announce: body.announce,
+      categories: ensureArray(body.categories),
+      fullText: body[`full-text`],
+      picture: file ? file.filename : body[`old-image`],
+      title: body.title,
+    };
+    await api.editArticle(id, articleData);
     res.redirect(`/my`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
@@ -70,7 +70,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
       api.getArticle(id),
       api.getCategories(),
     ]);
-    res.render(`articles/edit-post`, {article, categories, validationMessages});
+    res.render(`edit-post`, {article, categories, validationMessages});
   }
 });
 
@@ -79,10 +79,9 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
 
   const newArticle = {
     announce: body.announcement,
-    category: ensureArray(body.categories),
-    createdDate: body.date,
+    categories: ensureArray(body.categories),
     fullText: body[`full_text`],
-    picture: file ? file.filename : ``,
+    image: file ? file.filename : ``,
     title: body.title,
   };
 
@@ -92,7 +91,7 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const categories = await api.getCategories();
-    res.redirect(`articles/new-post`, {categories, validationMessages});
+    res.render(`new-post`, {categories, validationMessages});
   }
 });
 
@@ -105,7 +104,7 @@ articlesRouter.post(`/:id/comments`, async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const article = await await api.getArticle(id);
-    res.render(`articles/post`, {article, id, validationMessages});
+    res.render(`post`, {article, id, validationMessages});
   }
 });
 

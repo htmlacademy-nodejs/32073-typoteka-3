@@ -5,7 +5,7 @@ block content
     section
       .popup.popup--new-publication.popup--anti
         .new-publication
-          form(action='#' method='POST')
+          form(action=`/articles/edit/${article.id}` method='POST' id='new-article-form'  enctype="multipart/form-data" autocomplete="off")
             .new-publication__header
               h1 Редактирование публикации
               .new-publication__date-form
@@ -13,12 +13,11 @@ block content
                 .new-publication__date-form-division
                   .new-publication__date-block
                     label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='date' value=`${article.createdDate}`)
+                    input#new-publication-date(type='text' name='date' value=`${article.createdAt}`)
               button.new-publication__button.button.button--colored(type='submit') Опубликовать
             a.popup__button.button.button--popup-close(aria-label='Закрыть окно')
               | Закрыть
               | окно
-            +insertErrorMessage(validationMessages)
             .new-publication__form.form
               .form__wrapper.form__wrapper--intro
                 .form__field
@@ -35,13 +34,14 @@ block content
                 .new-publication__category-wrapper
                   each category, idx in categories
                     .new-publication__checkbox(class=`new-publication__checkbox--${idx}`)
-                      input(id=idx type="checkbox" name="category" checked=(article ? article.category.includes(category.name) : false))
-                      label(for=idx) #{category.name}
+                      input(id=`category-${idx}` type="checkbox" name="categories" value=`${category.id}` checked=(article ? article.categories.find(item => item.name === category.name) : false))
+                      label(for=`category-${idx}`) #{category.name}
                   a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='5' name='announcement' placeholder='Анонс публикации') #{article.announce}
+                    textarea(rows='5' name='announce' placeholder='Анонс публикации') #{article.announce}
                 .form__field.form__field--publication-text
                   label
                     textarea(rows='10' name='full-text' placeholder='Полный текст публикации') #{article.fullText}
+            +insertErrorMessage(validationMessages)
