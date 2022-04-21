@@ -24,8 +24,8 @@ class API {
     return await this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
-  async getArticle(id, {needComments}) {
-    return await this._load(`/articles/${id}`, {params: {needComments}});
+  async getArticle(id) {
+    return await this._load(`/articles/${id}`);
   }
 
   async search(query) {
@@ -58,6 +58,8 @@ class API {
   }
 
   createUser(data) {
+    console.log(`data:`, data);
+
     return this._load(`/user`, {
       method: HttpMethod.POST,
       data

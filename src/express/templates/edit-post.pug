@@ -6,7 +6,6 @@ block content
       .popup.popup--new-publication.popup--anti
         .new-publication
           form(action=`/articles/edit/${article.id}` method='POST' id='new-article-form'  enctype="multipart/form-data" autocomplete="off")
-            input(type="hidden" name="_csrf" value=csrfToken)
             .new-publication__header
               h1 Редактирование публикации
               .new-publication__date-form
