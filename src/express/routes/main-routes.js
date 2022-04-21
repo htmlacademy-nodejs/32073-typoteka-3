@@ -31,8 +31,6 @@ mainRouter.get(`/`, async (req, res) => {
 });
 
 mainRouter.get(`/register`, (req, res) => {
-  // const {user} = req.session;
-  // console.log(`user`, user);
   res.render(`sign-up`);
 });
 
@@ -51,7 +49,6 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
     res.redirect(`/login`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
-    // const {user} = req.session;
     res.render(`sign-up`, {validationMessages});
   }
 });
