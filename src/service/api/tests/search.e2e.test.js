@@ -8,12 +8,29 @@ const Sequelize = require(`sequelize`);
 const initDB = require(`../../lib/init-db`);
 const mockCategories = require(`./mocks/categories.mock.json`);
 const mockArticles = require(`./mocks/articles.mock.json`);
+const passwordUtils = require(`../../lib/password`);
+
 
 const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 let server;
 
+const mockUsers = [
+  {
+    name: `Иван Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar01.jpg`
+  },
+  {
+    name: `Пётр Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar02.jpg`
+  }
+];
+
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers});
   server = getServer(mockDB);
 });
 

@@ -8,10 +8,26 @@ const Sequelize = require(`sequelize`);
 const initDB = require(`../../lib/init-db`);
 const mockCategories = require(`./mocks/categories.mock.json`);
 const mockArticles = require(`./mocks/articles.mock.json`);
+const passwordUtils = require(`../../lib/password`);
+
+const mockUsers = [
+  {
+    name: `Иван Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar01.jpg`
+  },
+  {
+    name: `Пётр Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar02.jpg`
+  }
+];
 
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers});
   return getServer(mockDB);
 };
 
@@ -52,6 +68,7 @@ describe(`API returns an article with given id`, () => {
 describe(`API creates an article if data is valid`, () => {
 
   const newArticle = {
+    "userId": 1,
     "categories": [1, 2],
     "title": `Обзор новейшего смартфона и что-то еще тут, подходящее по длине, созданный`,
     "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
@@ -79,6 +96,7 @@ describe(`API creates an article if data is valid`, () => {
 describe(`API refuses to create an article if data is invalid`, () => {
 
   const newArticle = {
+    "userId": 1,
     "title": `Обзор новейшего смартфона`,
     "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
     "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
@@ -134,6 +152,7 @@ describe(`API refuses to create an article if data is invalid`, () => {
 
 describe(`API changes existent article`, () => {
   const newArticle = {
+    "userId": 1,
     "title": `Обзор новейшего смартфона и что-то еще тут, подходящее по длине, изменен`,
     "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
     "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
@@ -170,6 +189,7 @@ describe(`API works correctly when trying to change an article in a wrong way`, 
   test(`API returns status code 404 when trying to change non-existent article`, () => {
 
     const validArticle = {
+      "userId": 1,
       "title": `Обзор новейшего смартфона и что-то еще тут, подходящее по длине, изменен`,
       "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
       "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
@@ -185,6 +205,7 @@ describe(`API works correctly when trying to change an article in a wrong way`, 
   test(`API returns status code 400 when trying to change an article with invalid data`, () => {
 
     const invalidArticle = {
+      "userId": 1,
       "title": `Это`,
       "announce": `не`,
       "fullText": `валидный`,
@@ -249,6 +270,7 @@ describe(`API returns a list of comments to given article`, () => {
 describe(`API creates a comment if data is valid`, () => {
 
   const newComment = {
+    userId: 1,
     text: `Валидному комментарию достаточно этого поля`
   };
 
