@@ -52,13 +52,10 @@ describe(`API returns an article with given id`, () => {
 describe(`API creates an article if data is valid`, () => {
 
   const newArticle = {
-    "title": `Обзор новейшего смартфона созданный`,
-    "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно. Просто действуйте. Маленькими шагами. Освоить вёрстку несложно. Возьмите книгу новую книгу и закрепите все упражнения на практике.`,
+    "categories": [1, 2],
+    "title": `Обзор новейшего смартфона и что-то еще тут, подходящее по длине, созданный`,
+    "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
     "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
-    "category": [
-      `Деревья`,
-      `За жизнь`
-    ],
   };
 
   let server;
@@ -83,16 +80,18 @@ describe(`API refuses to create an article if data is invalid`, () => {
 
   const newArticle = {
     "title": `Обзор новейшего смартфона`,
-    "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно. Просто действуйте. Маленькими шагами. Освоить вёрстку несложно. Возьмите книгу новую книгу и закрепите все упражнения на практике.`,
+    "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
     "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
-    "category": [
-      `Деревья`,
-      `За жизнь`
-    ],
+    "categories": [1, 2],
   };
 
+  let server;
+
+  beforeAll(async ()=> {
+    server = await createAPI();
+  });
+
   test(`Without any required property response code is 400`, async () => {
-    const server = await createAPI();
 
     for (const key of Object.keys(newArticle)) {
       const badArticle = {...newArticle};
@@ -103,17 +102,42 @@ describe(`API refuses to create an article if data is invalid`, () => {
         .expect(HttpCode.BAD_REQUEST);
     }
   });
+
+  test(`When field type is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, categories: `true`},
+      {...newArticle, image: 12345},
+      {...newArticle, categories: `Котики`}
+    ];
+    for (const badArticle of badArticles) {
+      await request(server)
+        .post(`${API_PREFIX}/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field value is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, title: `too short`},
+      {...newArticle, announce: `too short`},
+      {...newArticle, categories: []}
+    ];
+    for (const badArticle of badArticles) {
+      await request(server)
+        .post(`${API_PREFIX}/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
 });
 
 describe(`API changes existent article`, () => {
   const newArticle = {
-    "title": `Обзор новейшего смартфона изменен`,
-    "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно. Просто действуйте. Маленькими шагами. Освоить вёрстку несложно. Возьмите книгу новую книгу и закрепите все упражнения на практике.`,
+    "title": `Обзор новейшего смартфона и что-то еще тут, подходящее по длине, изменен`,
+    "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
     "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
-    "category": [
-      `Деревья`,
-      `За жизнь`
-    ],
+    "categories": [1, 2],
   };
 
   let server;
@@ -131,7 +155,7 @@ describe(`API changes existent article`, () => {
 
   test(`Article is really changed`, () => request(server)
     .get(`${API_PREFIX}/articles/1`)
-    .expect((res) => expect(res.body.title).toBe(`Обзор новейшего смартфона изменен`))
+    .expect((res) => expect(res.body.title).toBe(`Обзор новейшего смартфона и что-то еще тут, подходящее по длине, изменен`))
   );
 
 });
@@ -146,17 +170,14 @@ describe(`API works correctly when trying to change an article in a wrong way`, 
   test(`API returns status code 404 when trying to change non-existent article`, () => {
 
     const validArticle = {
-      "title": `Обзор новейшего смартфона`,
-      "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно. Просто действуйте. Маленькими шагами. Освоить вёрстку несложно. Возьмите книгу новую книгу и закрепите все упражнения на практике.`,
+      "title": `Обзор новейшего смартфона и что-то еще тут, подходящее по длине, изменен`,
+      "announce": `Помните небольшое количество ежедневных упражнений лучше чем один раз но много. Простые ежедневные упражнения помогут достичь успеха. Бороться с прокрастинацией несложно.`,
       "fullText": `Первая большая ёлка была установлена только в 1938 году. Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Вы можете достичь всего. Стоит только немного постараться и запастись книгами. Программировать не настолько сложно как об этом говорят. Достичь успеха помогут ежедневные повторения. Собрать камни бесконечности легко если вы прирожденный герой. Игры и программирование разные вещи. Не стоит идти в программисты если вам нравится только игры. Он написал больше 30 хитов.`,
-      "category": [
-        `Деревья`,
-        `За жизнь`
-      ],
+      "categories": [1, 2],
     };
 
     return request(server)
-      .put(`${API_PREFIX}/articles/NOEXST`)
+      .put(`${API_PREFIX}/articles/100500`)
       .send(validArticle)
       .expect(HttpCode.NOT_FOUND);
   });
@@ -171,7 +192,7 @@ describe(`API works correctly when trying to change an article in a wrong way`, 
     };
 
     return request(server)
-      .put(`${API_PREFIX}/articles/NOEXST`)
+      .put(`${API_PREFIX}/articles/100500`)
       .send(invalidArticle)
       .expect(HttpCode.BAD_REQUEST);
   });
@@ -201,7 +222,7 @@ describe(`API correctly deletes an article`, () => {
 
   test(`API refuses to delete non-existent article`, () => {
     return request(server)
-      .delete(`${API_PREFIX}/articles/NOEXST`)
+      .delete(`${API_PREFIX}/articles/1005`)
       .expect(HttpCode.NOT_FOUND);
   });
 });
@@ -268,9 +289,9 @@ describe(`API doesn't create a comment if data is invalid`, () => {
 
   test(`API refuses to create a comment to non-existent article and returns status code 404`, () => {
     return request(server)
-      .post(`${API_PREFIX}/articles/NOEXST/comments`)
+      .post(`${API_PREFIX}/articles/100500/comments`)
       .send({
-        text: `Неважно`
+        text: `Неважно насколько длинный этот комментарий`
       })
       .expect(HttpCode.NOT_FOUND);
   });
@@ -306,7 +327,7 @@ describe(`API doesn't create a comment if data is invalid`, () => {
   test(`API refuses to delete non-existent comment`, () => {
 
     return request(server)
-      .delete(`${API_PREFIX}/articles/1/comments/NOEXST`)
+      .delete(`${API_PREFIX}/articles/1/comments/100500`)
       .expect(HttpCode.NOT_FOUND);
   });
 
@@ -314,7 +335,7 @@ describe(`API doesn't create a comment if data is invalid`, () => {
   test(`API refuses to delete a comment to non-existent article`, () => {
 
     return request(server)
-      .delete(`${API_PREFIX}/articles/NOEXST/comments/kqME9j`)
+      .delete(`${API_PREFIX}/articles/100500/comments/1`)
       .expect(HttpCode.NOT_FOUND);
 
   });

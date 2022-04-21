@@ -16,6 +16,12 @@ module.exports = {
     UNAUTHORIZED: 401,
     BAD_REQUEST: 400,
   },
+  HttpMethod: {
+    GET: `GET`,
+    POST: `POST`,
+    PUT: `PUT`,
+    DELETE: `DELETE`
+  },
 
   MAX_ID_LENGTH: 6,
   API_PREFIX: `/api`,

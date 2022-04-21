@@ -8,7 +8,7 @@ const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
 const {HttpCode} = require(`../../constants`);
 const UPLOAD_DIR = `../upload/img/`;
-const {ensureArray} = require(`../../utils`);
+const {ensureArray, prepareErrors} = require(`../../utils`);
 
 const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
@@ -50,23 +50,61 @@ articlesRouter.get(`/edit/:id`, async (req, res, _next) => {
   }
 });
 
+articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
+  const {id} = req.params;
+  const {body, file} = req;
+
+  try {
+    const articleData = {
+      announce: body.announce,
+      categories: ensureArray(body.categories),
+      fullText: body[`full-text`],
+      picture: file ? file.filename : body[`old-image`],
+      title: body.title,
+    };
+    await api.editArticle(id, articleData);
+    res.redirect(`/my`);
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const [article, categories] = await Promise.all([
+      api.getArticle(id),
+      api.getCategories(),
+    ]);
+    res.render(`edit-post`, {article, categories, validationMessages});
+  }
+});
+
 articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
   const {body, file} = req;
 
   const newArticle = {
     announce: body.announcement,
-    category: ensureArray(body.categories),
-    createdDate: body.date,
+    categories: ensureArray(body.categories),
     fullText: body[`full_text`],
-    picture: file ? file.filename : ``,
+    image: file ? file.filename : ``,
     title: body.title,
   };
 
   try {
     await api.createArticle(newArticle);
     res.redirect(`/my`);
-  } catch (e) {
-    res.redirect(`back`);
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const categories = await api.getCategories();
+    res.render(`new-post`, {categories, validationMessages});
+  }
+});
+
+articlesRouter.post(`/:id/comments`, async (req, res) => {
+  const {id} = req.params;
+  const {comment} = req.body;
+  try {
+    await api.createComment(id, {text: comment});
+    res.redirect(`/article/${id}`);
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const article = await await api.getArticle(id);
+    res.render(`post`, {article, id, validationMessages});
   }
 });
 
