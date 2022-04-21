@@ -5,6 +5,7 @@ const chalk = require(`chalk`);
 const getSequelize = require(`../lib/sequelize`);
 const {getLogger} = require(`../lib/logger`);
 const initDatabase = require(`../lib/init-db`);
+const passwordUtils = require(`../lib/password`);
 const sequelize = getSequelize();
 
 const {
@@ -80,8 +81,9 @@ const getRandomSubarray = (items) => {
   return result;
 };
 
-const generateArticles = (count, titles, categories, images, sentences, comments) => (
+const generateArticles = (count, titles, categories, images, sentences, comments, users) => (
   Array(count).fill({}).map(() => ({
+    user: users[getRandomInt(0, users.length - 1)].email,
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffle(sentences).slice(ANNOUNCE_SENTENCES_RESTRICT.min, ANNOUNCE_SENTENCES_RESTRICT.max).join(` `),
     image: generateImage(images),
@@ -110,10 +112,25 @@ module.exports = {
     const comments = await readContent(FILE_COMMENTS_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
 
+    const users = [
+      {
+        name: `Иван Иванов`,
+        email: `ivanov@example.com`,
+        passwordHash: await passwordUtils.hash(`ivanov`),
+        avatar: `avatar01.jpg`
+      },
+      {
+        name: `Пётр Петров`,
+        email: `petrov@example.com`,
+        passwordHash: await passwordUtils.hash(`petrov`),
+        avatar: `avatar02.jpg`
+      }
+    ];
+
     const [count] = args;
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const articles = generateArticles(countArticles, titles, categories, images, sentences, comments);
+    const articles = generateArticles(countArticles, titles, categories, images, sentences, comments, users);
 
-    return initDatabase(sequelize, {categories, articles});
+    return initDatabase(sequelize, {categories, articles, users});
   }
 };

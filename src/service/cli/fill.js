@@ -12,6 +12,8 @@ const {
   shuffle,
 } = require(`../../utils`);
 
+const passwordUtils = require(`../lib/password`);
+
 const DEFAULT_COUNT = 1;
 const MAX_COMMENTS = 4;
 const FILE_NAME = `fill-db.sql`;
@@ -28,23 +30,6 @@ const ANNOUNCE_SENTENCES_RESTRICT = {
 };
 
 const DATE_MONTHS_RANGE = 2;
-
-const users = [
-  {
-    email: `ivanov@example.com`,
-    passwordHash: `5f4dcc3b5aa765d61d8327deb882cf99`,
-    firstName: `Иван`,
-    lastName: `Иванов`,
-    avatar: `avatar1.jpg`
-  },
-  {
-    email: `petrov@example.com`,
-    passwordHash: `5f4dcc3b5aa765d61d8327deb882cf99`,
-    firstName: `Пётр`,
-    lastName: `Петров`,
-    avatar: `avatar2.jpg`
-  }
-];
 
 
 const readContent = async (filePath) => {
@@ -108,6 +93,20 @@ module.exports = {
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
+    const users = [
+      {
+        name: `Иван Иванов`,
+        email: `ivanov@example.com`,
+        passwordHash: await passwordUtils.hash(`ivanov`),
+        avatar: `avatar01.jpg`
+      },
+      {
+        name: `Пётр Петров`,
+        email: `petrov@example.com`,
+        passwordHash: await passwordUtils.hash(`petrov`),
+        avatar: `avatar02.jpg`
+      }
+    ];
 
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
     const articles = generateArticles(countArticles, titles, categories.length, images, sentences, comments, users.length);

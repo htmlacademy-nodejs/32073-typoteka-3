@@ -56,6 +56,22 @@ class API {
       data
     });
   }
+
+  createUser(data) {
+    console.log(`data:`, data);
+
+    return this._load(`/user`, {
+      method: HttpMethod.POST,
+      data
+    });
+  }
+
+  auth(email, password) {
+    return this._load(`/user/auth`, {
+      method: HttpMethod.POST,
+      data: {email, password}
+    });
+  }
 }
 
 const defaultAPI = new API(defaultUrl, TIMEOUT);

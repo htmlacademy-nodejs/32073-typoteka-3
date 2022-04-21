@@ -24,6 +24,7 @@ app.use(`/`, mainRoutes);
 
 app.use((req, res) => res.status(400).render(`404`));
 app.use((err, req, res, next) => {
+  console.log(`err`, err);
   res.status(500).render(`500`);
   next();
 });
