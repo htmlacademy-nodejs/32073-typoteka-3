@@ -4,8 +4,8 @@
   "description": "Типотека",
   "main": "./src/service/service.js",
   "scripts": {
-    "start": "cross-env LOG_LEVEL=error node -r dotenv/config ./src/service/service.js --server 3000",
-    "start::debug": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon -r dotenv/config ./src/service/service.js --server 3000",
+    "start-back-server": "cross-env LOG_LEVEL=error node -r dotenv/config ./src/service/service.js --server 3000",
+    "start-back-server::debug": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon -r dotenv/config ./src/service/service.js --server 3000",
     "generate": "node ./src/service/service.js --generate",
     "fill": "node ./src/service/service.js --fill",
     "filldb": "node -r dotenv/config ./src/service/service.js --filldb",
@@ -13,7 +13,11 @@
     "jest": "cross-env LOG_LEVEL=error jest",
     "eslint": "eslint --ext .js src/",
     "eslint::fix": "eslint --fix --ext .js src/",
-    "start-frontend-server": "cross-env LOG_LEVEL=error nodemon -r dotenv/config ./src/express/index.js"
+    "start-frontend-server": "cross-env LOG_LEVEL=error nodemon -r dotenv/config ./src/express/index.js",
+    "start-frontend-server::debug": "cross-env LOG_LEVEL=debug nodemon -r dotenv/config ./src/express/index.js",
+    "start-servers": "concurrently \"npm run start-back-server\" \"npm run start-frontend-server\"",
+    "start-servers::debug": "concurrently \"npm run start-back-server::debug\" \"npm run start-frontend-server::debug\"",
+    "start": "npm run start-servers"
   },
   "repository": {
     "type": "git",
@@ -38,6 +42,7 @@
   "dependencies": {
     "axios": "0.26.1",
     "bcrypt": "5.0.1",
+    "concurrently": "7.1.0",
     "connect-session-sequelize": "7.1.3",
     "cross-env": "7.0.3",
     "csurf": "1.11.0",
