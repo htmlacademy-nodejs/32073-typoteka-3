@@ -75,8 +75,7 @@ mainRouter.post(`/login`, async (req, res) => {
 });
 
 mainRouter.get(`/logout`, (req, res) => {
-  delete req.session.user;
-  res.redirect(`/login`);
+  req.session.destroy(() => res.redirect(`/login`));
 });
 
 mainRouter.get(`/search`, async (req, res) => {
