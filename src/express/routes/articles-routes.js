@@ -74,7 +74,6 @@ articlesRouter.get(`/edit/:id`, authAdmin, csrfProtection, async (req, res, _nex
     ]);
     return res.render(`edit-post`, {article, categories, user, csrfToken: req.csrfToken()});
   } catch (err) {
-    console.log(`Error while edit:`, err);
     return res.status(HttpCode.NOT_FOUND)
       .render(`404`);
   }

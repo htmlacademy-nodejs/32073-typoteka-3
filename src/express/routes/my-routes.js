@@ -37,7 +37,6 @@ myRouter.get(`/categories`, authAdmin, csrfProtection, async (req, res, next) =>
   const {user} = req.session;
   try {
     const categories = await api.getCategories({count: true});
-    console.log(`categories`, categories);
     res.render(`all-categories`, {categories, user, csrfToken: req.csrfToken()});
   } catch (error) {
     next(error);
@@ -83,7 +82,6 @@ myRouter.post(`/comments/delete/:id`, authAdmin, async (req, res, next) => {
     await api.deleteComment(id);
     return res.redirect(`/my/comments`);
   } catch (error) {
-    console.log(`error`, error);
     return next(error);
   }
 });

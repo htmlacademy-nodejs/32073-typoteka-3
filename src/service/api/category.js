@@ -33,7 +33,6 @@ module.exports = (app, service) => {
 
   route.put(`/:categoryId`, categoryValidator, async (req, res) => {
     const {categoryId} = req.params;
-    console.log(`categoryId`, categoryId);
     const updated = await service.update(categoryId, req.body);
 
     res.status(HttpCode.OK).json(updated);
