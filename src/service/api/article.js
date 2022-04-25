@@ -13,20 +13,34 @@ module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
-    const {offset, limit, comments} = req.query;
+    const {limit, offset, userId, categoryId, withComments, onlyHot = false} = req.query;
+
     let result;
-    if (limit || offset) {
-      result = await articleService.findPage({comments, limit, offset});
-    } else {
-      result = await articleService.findAll(comments);
+
+    if (onlyHot) {
+      result = await articleService.findHot({limit});
+      return res.status(HttpCode.OK).json(result);
     }
 
-    res.status(HttpCode.OK).json(result);
+    if (userId) {
+      result = await articleService.findAll({userId, withComments});
+      return res.status(HttpCode.OK).json(result);
+    }
+
+    if (categoryId) {
+      result = await articleService.findPage({limit, offset, categoryId, withComments});
+    } else if (limit || offset) {
+      result = await articleService.findPage({withComments, limit, offset});
+    } else {
+      result = await articleService.findAll(withComments);
+    }
+
+    return res.status(HttpCode.OK).json(result);
   });
 
   route.get(`/:articleId`, routeParamsValidator, async (req, res) => {
     const {articleId} = req.params;
-    const {needComments} = req.query;
+    const {needComments = true} = req.query;
     const article = await articleService.findOne(articleId, needComments);
 
     if (!article) {

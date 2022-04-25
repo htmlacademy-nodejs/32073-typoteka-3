@@ -4,18 +4,43 @@ const {Router} = require(`express`);
 const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
 const {HttpCode} = require(`../../constants`);
-const {auth, upload} = require(`../middlewares`);
+const {upload, authAdmin} = require(`../middlewares`);
 const csrf = require(`csurf`);
 const csrfProtection = csrf();
+const truncate = require(`../../service/lib/truncate`);
 
 const {ensureArray, prepareErrors} = require(`../../utils`);
 
-articlesRouter.get(`/category/:id`, (req, res) => {
+const ARTICLES_PER_PAGE = 8;
+const ANNOUNCE_MAX_LENGTH = 55;
+
+articlesRouter.get(`/category/:id`, async (req, res) => {
   const {user} = req.session;
-  res.render(`articles-by-category`, {user});
+  const id = +req.params.id;
+  // получаем номер страницы
+  let {page = 1} = req.query;
+  page = +page;
+
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  const [
+    {count, articles},
+    categories,
+  ] = await Promise.all([
+    api.getArticles({offset, limit, categoryId: id, withComments: true}),
+    api.getCategories(true), // опциональный аргумент
+  ]);
+
+  const category = categories.find((cat) => cat.id === id);
+  const truncateAnnounce = (announce) => truncate(announce, ANNOUNCE_MAX_LENGTH);
+
+  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+  res.render(`articles-by-category`, {articles, page, totalPages, categories, category, user, truncateAnnounce});
 });
 
-articlesRouter.get(`/add`, auth, csrfProtection, async (req, res) => {
+articlesRouter.get(`/add`, authAdmin, csrfProtection, async (req, res) => {
   const {user} = req.session;
 
   const categories = await api.getCategories();
@@ -26,22 +51,30 @@ articlesRouter.get(`/:id`, csrfProtection, async (req, res) => {
   const {user} = req.session;
 
   const {id} = req.params;
-  const article = await api.getArticle(id, {needComments: true});
-  return res.render(`post`, {article, user, id, csrfToken: req.csrfToken()});
+  const [
+    article,
+    categories,
+  ] = await Promise.all([
+    api.getArticle(id, {needComments: true}),
+    api.getCategories(true), // опциональный аргумент
+  ]);
+
+  return res.render(`post`, {article, categories, user, id, csrfToken: req.csrfToken()});
 });
 
-articlesRouter.get(`/edit/:id`, auth, csrfProtection, async (req, res, _next) => {
+articlesRouter.get(`/edit/:id`, authAdmin, csrfProtection, async (req, res, _next) => {
   const {user} = req.session;
 
   const {id} = req.params;
 
   try {
     const [article, categories] = await Promise.all([
-      api.getArticle(id),
+      api.getArticle(id, {needComments: false}),
       api.getCategories(),
     ]);
     return res.render(`edit-post`, {article, categories, user, csrfToken: req.csrfToken()});
   } catch (err) {
+    console.log(`Error while edit:`, err);
     return res.status(HttpCode.NOT_FOUND)
       .render(`404`);
   }
@@ -66,7 +99,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`avatar`), csrfProtection, async 
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const [article, categories] = await Promise.all([
-      api.getArticle(id),
+      api.getArticle(id, {needComments: false}),
       api.getCategories(),
     ]);
     res.render(`edit-post`, {article, user, categories, validationMessages});
@@ -92,7 +125,7 @@ articlesRouter.post(`/add`, upload.single(`upload`), csrfProtection, async (req,
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const categories = await api.getCategories();
-    res.render(`new-post`, {categories, validationMessages, user});
+    res.render(`new-post`, {categories, validationMessages, user, csrfToken: req.csrfToken()});
   }
 });
 
@@ -103,11 +136,17 @@ articlesRouter.post(`/:id/comments`, csrfProtection, async (req, res) => {
 
   try {
     await api.createComment(id, {userId: user.id, text: comment});
-    res.redirect(`/article/${id}`);
+    res.redirect(`/articles/${id}`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
-    const article = await await api.getArticle(id);
-    res.render(`post`, {article, id, user, validationMessages, csrfToken: req.csrfToken()});
+    const [
+      article,
+      categories,
+    ] = await Promise.all([
+      api.getArticle(id, {needComments: true}),
+      api.getCategories(true), // опциональный аргумент
+    ]);
+    res.render(`post`, {article, categories, id, user, validationMessages, csrfToken: req.csrfToken()});
   }
 });
 

@@ -1,0 +1,28 @@
+if !articles.length
+  div.main-page__empty-wrapper
+    p.main-page__empty-text Здесь пока пусто!
+else
+  section.main-page__list.preview
+    h2.visually-hidden Список превью статей
+    ul.preview__list
+      each article in articles
+        li.preview__item
+          if article.categories.length
+            ul.preview__breadcrumbs
+              each category in article.categories
+                li.preview__breadcrumbs-item
+                  a.preview__breadcrumbs-link(href=`/articles/category/${category.id}`) #{category.name}
+          .preview__background
+            img.preview__background-image(src=`img/${article.image ? article.image : 'blank.jpg'}` width='460' height='240' alt=`${article.title}`)
+          time.preview__time(datetime=`${article.createdAt}`)
+            +date(article.createdAt)
+          h3.preview__name
+            a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
+          p.preview__text #{truncateAnnounce(article.announce)}
+          a.preview__comment(href=`/articles/${article.id}`)
+            | Комментарии
+            span.preview__cloud
+            |
+            b.preview__comment-count #{article.comments.length}
+  .preview__toggle-wrapper
+    +pagination(page, totalPages, 2, `?`)

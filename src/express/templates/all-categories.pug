@@ -5,17 +5,22 @@ block content
     section.main-page__category.category
       h1.category__title Категории
       .category__add-form
-        form(action='#' method='POST')
+        form(action='/my/categories/add' method='POST')
+          input(name=`_csrf`, type=`hidden`, value=csrfToken)
           input#add-form-add-category(type='text' name='category' placeholder='Новая категория')
           label(for='add-form-add-category')
             span.visually-hidden Добавить категорию
           button.category__button.button.button--category(type='submit') Добавить
-      ul.category__list
-        each category in categories
-          li.category__list-item
-            form(action='#' method='POST')
-              input#modify-form-category-1(type='text' name='category' value=`${category.name}`)
-              label(for='modify-form-category-1')
-                span.visually-hidden Редактировать категорию
-              button.category__button.button.button--category(type='submit') Сохранить
-              button.category__button.button.button--category(type='button') Удалить
+      if categories && categories.length
+        +insertErrorMessage(validationMessages)
+        ul.category__list
+          each category, idx in categories
+            li.category__list-item(class=(idx === categories.length - 1 ? `category__list-item--last` : ``))
+              form(action=`/my/categories/${category.id}` method='POST')
+                input(name=`_csrf`, type=`hidden`, value=csrfToken)
+                input(id=`modify-form-category-${idx}`)(type='text' name='category' value=`${category.name}`)
+                label(for=`modify-form-category-${idx}`)
+                  span.visually-hidden Редактировать категорию
+                button.category__button.button.button--category(type='submit') Сохранить
+                if !category.count || category.count == 0
+                  button.category__button.button.button--category(name='deleteCategory' value=category.id type='submit') Удалить

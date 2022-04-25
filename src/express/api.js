@@ -20,8 +20,8 @@ class API {
     return response.data;
   }
 
-  async getArticles({offset, limit, comments}) {
-    return await this._load(`/articles`, {params: {offset, limit, comments}});
+  async getArticles({limit, offset, userId, categoryId, withComments, onlyHot}) {
+    return await this._load(`/articles`, {params: {limit, offset, userId, categoryId, withComments, onlyHot}});
   }
 
   async getArticle(id, {needComments}) {
@@ -34,6 +34,28 @@ class API {
 
   async getCategories(count) {
     return await this._load(`/categories`, {params: {count}});
+  }
+
+  async getCategory(id) {
+    return await this._load(`/categories/${id}`);
+  }
+
+  async createCategory(data) {
+    return this._load(`/categories`, {
+      method: HttpMethod.POST,
+      data
+    });
+  }
+  async editCategory(id, data) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.PUT,
+      data
+    });
+  }
+  async deleteCategory(id) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.DELETE
+    });
   }
 
   async createArticle(data) {
@@ -50,11 +72,28 @@ class API {
     });
   }
 
+  deleteArticle(id, data) {
+    return this._load(`/articles/${id}`, {
+      method: HttpMethod.DELETE,
+      data
+    });
+  }
+
   createComment(id, data) {
     return this._load(`/articles/${id}/comments`, {
       method: HttpMethod.POST,
       data
     });
+  }
+
+  async deleteComment(id) {
+    return this._load(`/comments/${id}`, {
+      method: HttpMethod.DELETE
+    });
+  }
+
+  async getComments({onlyLast, limit, userId} = {}) {
+    return this._load(`/comments`, {params: {onlyLast, limit, userId}});
   }
 
   createUser(data) {
