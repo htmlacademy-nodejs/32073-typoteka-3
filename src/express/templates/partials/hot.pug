@@ -1,0 +1,12 @@
+section.main-page__hot.hot
+  h2.hot__name
+    | Самое обсуждаемое
+    span.hot__icon.hot__icon--fire
+  if !hotArticles || !hotArticles.length
+    p.hot__empty Здесь пока ничего нет
+  ul.hot__list
+    each article in hotArticles
+      li.hot__list-item
+        a.hot__list-link(href='#')
+          | #{article.title}
+          sup.hot__link-sup #{article.commentsCount}

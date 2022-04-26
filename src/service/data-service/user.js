@@ -10,6 +10,10 @@ class UserService {
     return user.get();
   }
 
+  async getCount() {
+    return this._User.count();
+  }
+
   async findByEmail(email) {
     const user = await this._User.findOne({
       where: {email}

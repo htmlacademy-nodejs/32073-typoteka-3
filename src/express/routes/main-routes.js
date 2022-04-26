@@ -4,10 +4,14 @@ const {Router} = require(`express`);
 const mainRouter = new Router();
 const api = require(`../api`).getAPI();
 const {upload} = require(`../middlewares`);
-
+const truncate = require(`../../service/lib/truncate`);
 const {prepareErrors} = require(`../../utils`);
 
-const OFFERS_PER_PAGE = 8;
+const ARTICLES_PER_PAGE = 8;
+const HOT_ARTICLES_NUMBER = 4;
+const LAST_COMMENTS_NUMBER = 4;
+const ANNOUNCE_MAX_LENGTH = 55;
+
 
 mainRouter.get(`/`, async (req, res) => {
   const {user} = req.session;
@@ -15,20 +19,25 @@ mainRouter.get(`/`, async (req, res) => {
   let {page = 1} = req.query;
   page = +page;
 
-  const limit = OFFERS_PER_PAGE;
-  const offset = (page - 1) * OFFERS_PER_PAGE;
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
 
   const [
     {count, articles},
-    categories
+    hotArticles,
+    categories,
+    lastComments,
   ] = await Promise.all([
-    api.getArticles({offset, limit, comments: true}),
-    api.getCategories(true) // опциональный аргумент
+    api.getArticles({offset, limit, withComments: true}),
+    api.getArticles({onlyHot: true, limit: HOT_ARTICLES_NUMBER}),
+    api.getCategories(true), // опциональный аргумент
+    api.getComments({onlyLast: true, limit: LAST_COMMENTS_NUMBER})
   ]);
 
-  const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
+  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+  const truncateAnnounce = (announce) => truncate(announce, ANNOUNCE_MAX_LENGTH);
 
-  res.render(`main`, {articles, page, totalPages, categories, user});
+  res.render(`main`, {articles, hotArticles, page, totalPages, categories, lastComments, user, truncateAnnounce});
 });
 
 mainRouter.get(`/register`, (req, res) => {
@@ -94,9 +103,6 @@ mainRouter.get(`/search`, async (req, res) => {
     });
   }
 });
-mainRouter.get(`/categories`, async (req, res) => {
-  const categories = await api.getCategories();
-  return res.render(`all-categories`, {categories});
-});
+
 
 module.exports = mainRouter;

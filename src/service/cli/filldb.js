@@ -57,8 +57,9 @@ const generateDate = (dateMonthsRange) => {
   return new Date(getRandomInt(+minDate, +currentDate));
 };
 
-const generateComments = (count, comments) => (
+const generateComments = (count, comments, users) => (
   Array(count).fill({}).map(() => ({
+    user: users[getRandomInt(0, users.length - 1)].email,
     text: shuffle(comments)
       .slice(0, getRandomInt(1, 3))
       .join(` `),
@@ -90,7 +91,7 @@ const generateArticles = (count, titles, categories, images, sentences, comments
     fullText: shuffle(sentences).slice(FULLTEXT_SENTENCES_RESTRICT.min, FULLTEXT_SENTENCES_RESTRICT.max).join(` `),
     createdDate: generateDate(DATE_MONTHS_RANGE),
     categories: getRandomSubarray(categories),
-    comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments),
+    comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments, users),
   }))
 );
 
@@ -117,13 +118,15 @@ module.exports = {
         name: `Иван Иванов`,
         email: `ivanov@example.com`,
         passwordHash: await passwordUtils.hash(`ivanov`),
-        avatar: `avatar01.jpg`
+        avatar: `avatar-1.png`,
+        role: `admin`,
       },
       {
         name: `Пётр Петров`,
         email: `petrov@example.com`,
         passwordHash: await passwordUtils.hash(`petrov`),
-        avatar: `avatar02.jpg`
+        avatar: `avatar-2.png`,
+        role: `user`,
       }
     ];
 

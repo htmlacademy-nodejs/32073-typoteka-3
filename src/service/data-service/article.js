@@ -3,10 +3,12 @@
 const Aliase = require(`../models/aliase`);
 class ArticleService {
   constructor(sequelize) {
+    this._sequelize = sequelize;
     this._Article = sequelize.models.Article;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
     this._User = sequelize.models.User;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async create(articleData) {
@@ -101,7 +103,7 @@ class ArticleService {
     return articles.map((item) => item.get());
   }
 
-  async findPage({comments, limit, offset}) {
+  async findPage({categoryId, withComments, limit, offset}) {
     const include = [
       Aliase.CATEGORIES,
       {
@@ -113,7 +115,18 @@ class ArticleService {
       }
     ];
 
-    if (comments) {
+    if (categoryId) {
+      include.push({
+        model: this._ArticleCategory,
+        as: Aliase.ARTICLE_CATEGORIES,
+        attributes: [],
+        where: {
+          CategoryId: categoryId
+        }
+      });
+    }
+
+    if (withComments) {
       include.push({
         model: this._Comment,
         as: Aliase.COMMENTS,
@@ -134,11 +147,44 @@ class ArticleService {
       offset,
       include,
       order: [
-        [`createdAt`, `DESC`]
+        [`createdAt`, `desc`],
+        [{model: this._Category, as: Aliase.CATEGORIES}, `name`, `asc`]
       ],
       distinct: true
     });
     return {count, articles: rows};
+  }
+
+  async findHot({limit}) {
+    const options = {
+      subQuery: false,
+      attributes: {
+        include: [
+          [this._sequelize.fn(`COUNT`, this._sequelize.col(`comments.id`)), `commentsCount`]
+        ]
+      },
+      include: [
+        {
+          model: this._Comment,
+          as: Aliase.COMMENTS,
+          attributes: [],
+        }
+      ],
+      group: [
+        `Article.id`,
+      ],
+      order: [
+        [this._sequelize.fn(`COUNT`, this._sequelize.col(`comments.id`)), `DESC`]
+      ]
+    };
+
+    let articles = await this._Article.findAll(options);
+
+    articles = articles
+      .map((article) => article.get())
+      .filter((article) => article.commentsCount > 0);
+
+    return articles.slice(0, limit);
   }
 
 }

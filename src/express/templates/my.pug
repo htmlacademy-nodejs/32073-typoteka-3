@@ -7,7 +7,9 @@ block content
       ul.notes__list
         each article in articles
           li.notes__list-item
-            time.notes__item-time(datetime=`${article.createdAt}`) #{article.createdDate}
-            a.notes__item-text(href='#') #{article.title}
-            button.notes__button.button.button--close-item(type='button')
-              span.visually-hidden Закрыть строку списка
+            time.notes__item-time(datetime=`${article.createdAt}`) #{formatDate(article.createdAt)}
+            a.notes__item-text(href=`/articles/${article.id}`) #{article.title}
+            form(action=`/my` method="POST")
+              input(name=`articleId`, type=`hidden`, value=article.id)
+              button.notes__button.button.button--close-item(type='submit')
+                span.visually-hidden Закрыть строку списка

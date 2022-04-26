@@ -5,6 +5,7 @@ const category = require(`../api/category`);
 const article = require(`../api/article`);
 const search = require(`../api/search`);
 const user = require(`../api/user`);
+const comment = require(`../api/comment`);
 
 const {
   CategoryService,
@@ -21,6 +22,7 @@ const getRoutes = (db) => {
   search(app, new SearchService(db));
   article(app, new ArticleService(db), new CommentService(db));
   user(app, new UserService(db));
+  comment(app, new CommentService(db));
 
   return app;
 };

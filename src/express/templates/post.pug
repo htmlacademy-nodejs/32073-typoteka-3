@@ -1,11 +1,6 @@
 extends layout.pug
 
 block content
-  -
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
-      return date.toLocaleString();
-    }
   main
     section.post
       h1.visually-hidden Пост
@@ -14,17 +9,20 @@ block content
         .post__wrapper
           .post__head
             a.post__backwards.button.button--backwards(href='#') Назад
-            time.post__date(datetime=`${formatDate(article.createdAt)}`) #{formatDate(article.createdAt)}
+            time.post__date(datetime=article.createdAt) #{formatDate(article.createdAt)}
             h2.post__title.title.title--main #{article.title}
             ul.post__themes.themes
-              each category in article.categories
-                li.themes__item
-                  a.themes__item-link(href='#')
-                    | #{category.name}
-                    sup 88
-                  button.themes__remove-btn(type='button') Удалить категорию
-          .post__picture
-            +insertArticleImage(article)
+              each articleCategory in article.categories
+                each category in categories
+                  if articleCategory.id === category.id
+                    li.themes__item
+                      a.themes__item-link(href='#')
+                        | #{articleCategory.name}
+                        sup #{category.count}
+                      button.themes__remove-btn(type='button') Удалить категорию
+          if article.image
+            .post__picture
+              +insertArticleImage(article)
           .post__text
             h3 #{article.title}
             p.
@@ -33,23 +31,35 @@ block content
             p #{article.fullText}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
-          h2.comments__title.title.title--middle Комментарии
-          ul.comments__list
-            each comment in article.comments
-              li.comments__comment
-                .comments__avatar.avatar
-                  img(src='/img/avatar-1.png' alt='аватар пользователя')
-                .comments__text
-                  .comments__head
-                    p Евгений Петров •
-                    time.comments__date(datetime='2019-03-21T20:33') 21.03.2019, 20:33
-                  p.comments__message #{comment.text}
+          if article.comments && article.comments.length
+            h2.comments__title.title.title--middle Комментарии
+            ul.comments__list
+              each comment in article.comments
+                li.comments__comment
+                  .comments__avatar.avatar
+                    img(src=`/img/${comment.users.avatar}` alt=`${comment.users.name}`)
+                  .comments__text
+                    .comments__head
+                      p #{comment.users.name} •
+                      time.comments__date(datetime=comment.createdAt) #{formatDateWithTime(comment.createdAt)}
+                    p.comments__message #{comment.text}
+          else
+            h2.comments__title.title.title--middle Комментарии отсутствуют
           if user
             .comments__footer.comments__footer--user
-              form(action=`/${id}/comments` method='POST')
+              form(action=`/articles/${id}/comments` method='POST')
                 input(type="hidden" name="_csrf" value=csrfToken)
                 .comments__avatar.avatar
                   img(src=`/img/${user.avatar}` alt='аватар пользователя')
                 label
                   textarea(rows='1' name='comment' placeholder='Присоединиться к обсуждению')
                 button.comments__button.button.button--colored(type='submit') Опубликовать
+              p.comments__error
+                +insertErrorMessage(validationMessages)
+          else
+            .comments__footer.comments__footer--visitor
+              a.comments__button.button.button--colored(href=`login`) Войти
+              .comments__registration
+                p.text.text--signature
+                  b.title.title--small Регистрация
+                  | Чтобы присоединиться к переписке нужно зарегистрироваться
