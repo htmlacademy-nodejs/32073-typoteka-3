@@ -66,9 +66,7 @@ class CommentService {
       });
     }
 
-    const comments = await this._Comment.findAll(options);
-
-    return comments.map((comment) => comment.get());
+    return this._Comment.findAll(options);
   }
 
   async findLast(limit) {
