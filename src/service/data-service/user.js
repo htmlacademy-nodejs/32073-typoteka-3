@@ -11,7 +11,7 @@ class UserService {
   }
 
   async getCount() {
-    return await this._User.count();
+    return this._User.count();
   }
 
   async findByEmail(email) {

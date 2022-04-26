@@ -9,7 +9,7 @@ class CommentService {
     this._User = sequelize.models.User;
   }
 
-  create(articleId, comment) {
+  async create(articleId, comment) {
     return this._Comment.create({
       articleId,
       ...comment
@@ -66,7 +66,9 @@ class CommentService {
       });
     }
 
-    return await this._Comment.findAll(options);
+    const comments = await this._Comment.findAll(options);
+
+    return comments.map((comment) => comment.get());
   }
 
   async findLast(limit) {
