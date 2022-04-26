@@ -89,10 +89,9 @@ module.exports = (app, articleService, commentService) => {
 
   route.get(`/:articleId/comments`, routeParamsValidator, articleExist(articleService), async (req, res) => {
     const {articleId} = req.params;
-    const comments = await commentService.findAll(articleId);
+    const comments = await commentService.findAll({articleId});
     res.status(HttpCode.OK)
       .json(comments);
-
   });
 
   route.delete(`/:articleId/comments/:commentId`, routeParamsValidator, articleExist(articleService), async (req, res) => {

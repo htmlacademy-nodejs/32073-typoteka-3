@@ -30,7 +30,7 @@ const mockUsers = [
   }
 ];
 
-describe(`Categories API end-to-end tests`, () => {
+describe(`Comments API end-to-end tests`, () => {
   let server;
 
   beforeAll(async () => {
@@ -38,8 +38,8 @@ describe(`Categories API end-to-end tests`, () => {
     server = getServer(mockDB);
   });
 
-  test(`When get categories status code should be 200`, async () => {
-    const res = await request(server).get(`${API_PREFIX}/categories`);
+  test(`When get comments status code should be 200`, async () => {
+    const res = await request(server).get(`${API_PREFIX}/comments`);
     expect(res.statusCode).toBe(HttpCode.OK);
     expect(Array.isArray(res.body)).toBeTruthy();
   });

@@ -17,10 +17,23 @@ const ErrorAuthMessage = {
 module.exports = (app, service) => {
   app.use(`/user`, route);
 
+  route.get(`/count`, async (req, res) => {
+    const count = await service.getCount();
+    res.status(HttpCode.OK).json(count);
+  });
+
   route.post(`/`, userValidator(service), async (req, res) => {
     const data = req.body;
 
     data.passwordHash = await passwordUtils.hash(data.password);
+
+    const usersNumber = await service.getCount();
+
+    if (usersNumber === 1) {
+      data.role = `admin`;
+    } else {
+      data.role = `user`;
+    }
 
     const result = await service.create(data);
 

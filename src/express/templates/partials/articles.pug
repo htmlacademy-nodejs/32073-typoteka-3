@@ -14,8 +14,7 @@ else
                   a.preview__breadcrumbs-link(href=`/articles/category/${category.id}`) #{category.name}
           .preview__background
             img.preview__background-image(src=`img/${article.image ? article.image : 'blank.jpg'}` width='460' height='240' alt=`${article.title}`)
-          time.preview__time(datetime=`${article.createdAt}`)
-            +date(article.createdAt)
+          time.preview__time(datetime=`${article.createdAt}`) #{formatDate(article.createdAt)}
           h3.preview__name
             a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
           p.preview__text #{truncateAnnounce(article.announce)}

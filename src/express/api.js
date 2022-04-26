@@ -65,21 +65,21 @@ class API {
     });
   }
 
-  editArticle(id, data) {
+  async editArticle(id, data) {
     return this._load(`/articles/${id}`, {
       method: HttpMethod.PUT,
       data
     });
   }
 
-  deleteArticle(id, data) {
+  async deleteArticle(id, data) {
     return this._load(`/articles/${id}`, {
       method: HttpMethod.DELETE,
       data
     });
   }
 
-  createComment(id, data) {
+  async createComment(id, data) {
     return this._load(`/articles/${id}/comments`, {
       method: HttpMethod.POST,
       data
@@ -96,7 +96,7 @@ class API {
     return this._load(`/comments`, {params: {onlyLast, limit, userId}});
   }
 
-  createUser(data) {
+  async createUser(data) {
     return this._load(`/user`, {
       method: HttpMethod.POST,
       data
