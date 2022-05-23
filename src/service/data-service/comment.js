@@ -17,11 +17,23 @@ class CommentService {
   }
 
   async findOne(id) {
-    const comment = await this._Comment.findByPk(id);
-    if (comment) {
-      return comment.get({plain: true});
-    }
-    return comment;
+    return this._Comment.findOne({
+      where: id,
+      attributes: [`id`, `text`, `createdAt`],
+      include: [
+        {
+          model: this._User,
+          as: Aliase.USERS,
+          attributes: [`name`, `avatar`]
+        },
+        {
+          model: this._Article,
+          as: Aliase.ARTICLES,
+          attributes: [`title`, `id`]
+        }
+      ],
+      raw: true
+    });
   }
 
   async drop(id) {

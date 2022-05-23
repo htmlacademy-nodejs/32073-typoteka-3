@@ -111,6 +111,12 @@ module.exports = (app, articleService, commentService) => {
     const {articleId} = req.params;
     const comment = await commentService.create(articleId, req.body);
 
+    const io = req.app.locals.socketio;
+    const commentWithArticleData = await commentService.findOne(comment.id);
+    let popularArticles = await articleService.findHot({limit: false});
+
+    io.emit(`comment:create`, commentWithArticleData, popularArticles);
+
     return res.status(HttpCode.CREATED)
       .json(comment);
   });

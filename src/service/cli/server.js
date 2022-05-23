@@ -1,5 +1,7 @@
 'use strict';
 
+const socket = require(`../lib/socket`);
+const http = require(`http`);
 const {getServer} = require(`../api-server`);
 const {getLogger} = require(`../lib/logger`);
 const {ExitCode} = require(`../../constants`);
@@ -7,6 +9,7 @@ const getSequelize = require(`../lib/sequelize`);
 const defineModels = require(`../models`);
 
 const DEFAULT_PORT = 3000;
+
 
 module.exports = {
   name: `--server`,
@@ -30,8 +33,11 @@ module.exports = {
     try {
       defineModels(sequelize);
       const server = await getServer(sequelize);
+      const httpServer = http.createServer(server);
+      const io = socket(httpServer);
+      server.locals.socketio = io;
 
-      server.listen(port, (err) => {
+      httpServer.listen(port, (err) => {
         if (err) {
           logger.error(`An error occured on server creation: ${err.message}`);
         }

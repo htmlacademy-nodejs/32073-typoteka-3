@@ -184,6 +184,10 @@ class ArticleService {
       .map((article) => article.get())
       .filter((article) => article.commentsCount > 0);
 
+    if (!limit) {
+      return articles;
+    }
+
     return articles.slice(0, limit);
   }
 

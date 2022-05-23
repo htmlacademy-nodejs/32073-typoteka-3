@@ -7,6 +7,6 @@ section.main-page__hot.hot
   ul.hot__list
     each article in hotArticles
       li.hot__list-item
-        a.hot__list-link(href='#')
+        a.hot__list-link(href=`/articles/${article.id}`)
           | #{article.title}
           sup.hot__link-sup #{article.commentsCount}
