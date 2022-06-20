@@ -19,7 +19,6 @@ const define = (sequelize) => User.init({
   },
   avatar: {
     type: DataTypes.STRING,
-    allowNull: false
   },
   role: {
     type: DataTypes[`ENUM`](`admin`, `user`),
