@@ -53,7 +53,8 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
     name: `${body[`name`]} ${body[`surname`]}`,
     email: body[`email`],
     password: body[`password`],
-    passwordRepeated: body[`repeat-password`]
+    passwordRepeated: body[`repeat-password`],
+    role: `user`
   };
   try {
     await api.createUser(userData);
