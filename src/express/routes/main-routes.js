@@ -90,6 +90,7 @@ mainRouter.get(`/logout`, (req, res) => {
 
 mainRouter.get(`/search`, async (req, res) => {
   const {search} = req.query;
+  const {user} = req.session;
   try {
     const results = await api.search(search);
 
@@ -101,6 +102,7 @@ mainRouter.get(`/search`, async (req, res) => {
     res.render(`search`, {
       results: [],
       searchText: search,
+      user
     });
   }
 });
