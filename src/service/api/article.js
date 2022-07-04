@@ -115,7 +115,9 @@ module.exports = (app, articleService, commentService) => {
     const commentWithArticleData = await commentService.findOne(comment.id);
     let popularArticles = await articleService.findHot({limit: false});
 
-    io.emit(`comment:create`, commentWithArticleData, popularArticles);
+    if (io) {
+      io.emit(`comment:create`, commentWithArticleData, popularArticles);
+    }
 
     return res.status(HttpCode.CREATED)
       .json(comment);
