@@ -21,7 +21,7 @@ build/
 mocks.json
 
 #Логи
-src/service/logs/
+src/service/logs/*.txt
 
 # Директория с загруженными изображениями
 src/express/upload/
